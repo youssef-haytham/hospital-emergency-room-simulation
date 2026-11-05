@@ -63,6 +63,7 @@ public class Hospital {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Simulation interrupted.");
+            scanner.close();
             return;
         }
 

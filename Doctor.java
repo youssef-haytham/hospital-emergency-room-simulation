@@ -37,13 +37,13 @@ public class Doctor implements Runnable {
             }
 
             if (patient == null) {
-                Logger.log("Doctor " + doctorId + " is stopping.");
+                Status_printer.print_status("Doctor " + doctorId + " is stopping.");
                 return;
             }
 
-            Logger.log("Doctor " + doctorId + " is assigned to " + patient.getPatientName() + ".");
+            Status_printer.print_status("Doctor " + doctorId + " is assigned to " + patient.getPatientName() + ".");
 
-            Logger.log("Doctor " + doctorId + " is trying to acquire a treatment room.");
+            Status_printer.print_status("Doctor " + doctorId + " is trying to acquire a treatment room.");
 
             boolean roomAcquired = false;
             boolean patientNotified = false;
@@ -52,23 +52,23 @@ public class Doctor implements Runnable {
                 roomAcquired = treatmentRooms.tryAcquire(ROOM_TIMEOUT_MS);
 
                 if (!roomAcquired) {
-                    Logger.log("Doctor " + doctorId + " could not acquire a treatment room.");
+                    Status_printer.print_status("Doctor " + doctorId + " could not acquire a treatment room.");
 
-                    Logger.log("Doctor " + doctorId + " is sending " + patient.getPatientName() + " back to the waiting room.");
+                    Status_printer.print_status("Doctor " + doctorId + " is sending " + patient.getPatientName() + " back to the waiting room.");
 
                     patient.signalSentBack();
                     patientNotified = true;
 
                 } else {
-                    Logger.log("Doctor " + doctorId + " acquired a treatment room.");
+                    Status_printer.print_status("Doctor " + doctorId + " acquired a treatment room.");
 
-                    Logger.log("Doctor " + doctorId + " begins treating " + patient.getPatientName() + ".");
+                    Status_printer.print_status("Doctor " + doctorId + " begins treating " + patient.getPatientName() + ".");
 
                     int treatmentTime = ThreadLocalRandom.current().nextInt(MIN_TREATMENT_TIME_MS, MAX_TREATMENT_TIME_MS + 1);
 
                     Thread.sleep(treatmentTime);
 
-                    Logger.log("Doctor " + doctorId + " finished treating " + patient.getPatientName() + ".");
+                    Status_printer.print_status("Doctor " + doctorId + " finished treating " + patient.getPatientName() + ".");
 
                     patient.signalTreated();
                     patientNotified = true;
@@ -88,11 +88,11 @@ public class Doctor implements Runnable {
                 if (roomAcquired) {
                     treatmentRooms.release();
 
-                    Logger.log("Doctor " + doctorId + " released the treatment room.");
+                    Status_printer.print_status("Doctor " + doctorId + " released the treatment room.");
                 }
             }
 
-            Logger.log("Doctor " + doctorId + " is now available.");
+            Status_printer.print_status("Doctor " + doctorId + " is now available.");
         }
     }
 }
