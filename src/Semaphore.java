@@ -1,3 +1,4 @@
+package src;
 public class Semaphore {
 
     private int permits;
