@@ -1,5 +1,3 @@
-package src;
-
 public class TreatmentRooms {
 
     private final Semaphore semaphore = new Semaphore(2);
