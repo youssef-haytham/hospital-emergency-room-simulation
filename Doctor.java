@@ -14,15 +14,16 @@ public class Doctor implements Runnable {
 
     public Doctor(int doctorId,WaitingRoom waitingRoom,TreatmentRooms treatmentRooms) {
         this.doctorId = doctorId;
-        this.waitingRoom = waitingRoom;
+        this.waitingRoom = waitingRoom; 
         this.treatmentRooms = treatmentRooms;
     }
 
     @Override
     public void run() {
+        final String sep = System.lineSeparator();
+
         while (!Thread.currentThread().isInterrupted()) {
             Patient patient;
-
 
             try {
                 patient = waitingRoom.take();
@@ -31,63 +32,55 @@ public class Doctor implements Runnable {
                 return;
             }
 
-            if (patient == null) {
-                Status_printer.print_status("Doctor " + doctorId + " is stopping.");
+            if (patient == null) {          
                 return;
             }
 
-            Status_printer.print_status("Doctor " + doctorId + " is assigned to " + patient.getPatientName() + ".");
-
-            Status_printer.print_status("Doctor " + doctorId + " is trying to acquire a treatment room.");
+            String name = patient.getPatientName();
 
             boolean roomAcquired = false;
             boolean patientNotified = false;
 
             try {
+                waitingRoom.releaseSeat("Doctor " + doctorId + " is assigned to " + name + "." + sep + "Doctor " + doctorId + " is trying to acquire a treatment room.");
+
                 roomAcquired = treatmentRooms.tryAcquire(ROOM_TIMEOUT_MS);
 
                 if (!roomAcquired) {
-                    Status_printer.print_status("Doctor " + doctorId + " could not acquire a treatment room.");
-
-                    Status_printer.print_status("Doctor " + doctorId + " is sending " + patient.getPatientName() + " back to the waiting room.");
+                    Status_printer.print_status("Doctor " + doctorId + " could not acquire a treatment room." + sep + "Doctor " + doctorId + " is sending " + name + " back to the waiting room." + sep + "Doctor " + doctorId + " is now available.");
 
                     patient.signalSentBack();
                     patientNotified = true;
 
                 } else {
-                    Status_printer.print_status("Doctor " + doctorId + " acquired a treatment room.");
+                    Status_printer.print_status("Doctor " + doctorId + " acquired a treatment room." + sep + "Doctor " + doctorId + " begins treating " + name + ".");
 
-                    Status_printer.print_status("Doctor " + doctorId + " begins treating " + patient.getPatientName() + ".");
-
-                    int treatmentTime = ThreadLocalRandom.current().nextInt(MIN_TREATMENT_TIME_MS, MAX_TREATMENT_TIME_MS + 1);
-
+                    int treatmentTime = ThreadLocalRandom.current()
+                            .nextInt(MIN_TREATMENT_TIME_MS, MAX_TREATMENT_TIME_MS + 1);
                     Thread.sleep(treatmentTime);
 
-                    Status_printer.print_status("Doctor " + doctorId + " finished treating " + patient.getPatientName() + ".");
+                    Status_printer.print_status("Doctor " + doctorId + " finished treating " + name + "." + sep + "Doctor " + doctorId + " released the treatment room." + sep + "Doctor " + doctorId + " is now available.");
 
-                    patient.signalTreated();
+                    treatmentRooms.release();
+                    roomAcquired = false;           
+
+                    patient.signalTreated();  
                     patientNotified = true;
                 }
 
             } catch (InterruptedException e) {
-
                 if (!patientNotified) {
                     patient.signalSentBack();
                 }
-
                 Thread.currentThread().interrupt();
                 return;
 
             } finally {
-                
-                if (roomAcquired) {
+                if (roomAcquired) {             
                     treatmentRooms.release();
-
                     Status_printer.print_status("Doctor " + doctorId + " released the treatment room.");
                 }
             }
-
-            Status_printer.print_status("Doctor " + doctorId + " is now available.");
         }
     }
 }

@@ -1,6 +1,5 @@
 public class Semaphore {
-    // renamed from "room" to avoid confusion with waiting room / treatment rooms
-
+    
     private int permits;
 
     public Semaphore(int initial) {

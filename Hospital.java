@@ -17,9 +17,6 @@ public class Hospital {
         WaitingRoom waitingRoom = new WaitingRoom(capacity);
         TreatmentRooms treatmentRooms = new TreatmentRooms();
 
-        // ================ from here the code still needs more review =============
-
-        // Doctors first, so they are already idle when patients arrive.
         List<Thread> doctorThreads = new ArrayList<>();
         for (int i = 1; i <= doctorCount; i++) {
         Doctor doctor = new Doctor(i, waitingRoom, treatmentRooms);
@@ -28,7 +25,6 @@ public class Hospital {
         thread.start();
         }
 
-        // Create all patients first so the "Patients arriving" line is complete.
         List<Patient> patients = new ArrayList<>();
         StringBuilder names = new StringBuilder();
         for (int i = 1; i <= patientCount; i++) {
@@ -48,18 +44,17 @@ public class Hospital {
         }
 
         try {
-            // A patient thread ends only after it has been treated and has left,
-            // so when every join() returns, no patient needs treatment anymore.
+
             for (Patient patient : patients) {
                 patient.join();
             }
 
-            // One poison pill per doctor wakes up the blocked ones.
             waitingRoom.closeFor(doctorCount);
 
-            // for (Thread doctorThread : doctorThreads) {
-            // doctorThread.join();
-            // }
+            for (Thread doctorThread : doctorThreads) {
+            doctorThread.join();
+            }
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Simulation interrupted.");
