@@ -1,13 +1,9 @@
-/**
- * A patient in the emergency room. Each patient runs as its own thread.
- *
- * Lifecycle: arrive -> enter waiting room -> wait for the doctor's outcome
- *            -> (treated: leave) or (sent back: try to enter again).
- */
 public class Patient extends Thread {
 
     // The three states of the doctor's answer.
-    private enum Outcome { NONE, TREATED, SENT_BACK }
+    private enum Outcome {
+        NONE, TREATED, SENT_BACK
+    }
 
     private final int id;
     private final WaitingRoom waitingRoom;
@@ -32,7 +28,7 @@ public class Patient extends Thread {
 
     @Override
     public void run() {
-        Logger.log(getPatientName() + " arrived.");
+        Status_printer.print_status(getPatientName() + " arrived.");
         try {
             boolean treated = false;
             while (!treated) {
@@ -41,7 +37,7 @@ public class Patient extends Thread {
                 // Blocks until the doctor reports TREATED or SENT_BACK.
                 treated = waitUntilOutcome();
             }
-            Logger.log(getPatientName() + " left.");
+            Status_printer.print_status(getPatientName() + " left.");
         } catch (InterruptedException e) {
             // Not expected in normal flow. Restore the flag and stop.
             Thread.currentThread().interrupt();

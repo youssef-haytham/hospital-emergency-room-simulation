@@ -2,30 +2,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Entry point of the simulation. Reads the input, creates the shared
- * resources, doctors and patients, and shuts everything down cleanly.
- */
 public class Hospital {
-
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
 
-        int capacity = readPositiveInt(scanner, "Waiting room capacity: ");
-        int doctorCount = readPositiveInt(scanner, "Number of doctors: ");
-        int patientCount = readPositiveInt(scanner, "Number of patients: ");
+        System.out.println("Waiting room capacity: ");
+        int capacity = scanner.nextInt();
+        System.out.println("Number of doctors: ");
+        int doctorCount = scanner.nextInt();
+        System.out.println("Number of patients: ");
+        int patientCount = scanner.nextInt();
 
-        // Two independent shared resources (as the assignment requires).
         WaitingRoom waitingRoom = new WaitingRoom(capacity);
         TreatmentRooms treatmentRooms = new TreatmentRooms();
+
+        // from here the code needs more review 
 
         // Doctors first, so they are already idle when patients arrive.
         List<Thread> doctorThreads = new ArrayList<>();
         for (int i = 1; i <= doctorCount; i++) {
-            Doctor doctor = new Doctor(i, waitingRoom, treatmentRooms);
-            Thread thread = new Thread(doctor);
-            doctorThreads.add(thread);
-            thread.start();
+        Doctor doctor = new Doctor(i, waitingRoom, treatmentRooms);
+        Thread thread = new Thread(doctor);
+        doctorThreads.add(thread);
+        thread.start();
         }
 
         // Create all patients first so the "Patients arriving" line is complete.
@@ -40,8 +40,8 @@ public class Hospital {
             names.append(patient.getPatientName());
         }
 
-        Logger.log("Patients arriving:");
-        Logger.log(names.toString());
+        Status_printer.print_status("Patients arriving:");
+        Status_printer.print_status(names.toString());
 
         for (Patient patient : patients) {
             patient.start();
@@ -57,33 +57,18 @@ public class Hospital {
             // One poison pill per doctor wakes up the blocked ones.
             waitingRoom.closeFor(doctorCount);
 
-            for (Thread doctorThread : doctorThreads) {
-                doctorThread.join();
-            }
+            // for (Thread doctorThread : doctorThreads) {
+            // doctorThread.join();
+            // }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Simulation interrupted.");
             return;
         }
 
-        Logger.log("All patients have been treated.");
-        Logger.log("Simulation completed.");
-    }
+        Status_printer.print_status("All patients have been treated.");
+        Status_printer.print_status("Simulation completed.");
 
-    /** Keeps asking until the user enters a whole number >= 1. */
-    private static int readPositiveInt(Scanner scanner, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            String line = scanner.nextLine().trim();
-            try {
-                int value = Integer.parseInt(line);
-                if (value >= 1) {
-                    return value;
-                }
-            } catch (NumberFormatException e) {
-                // fall through to the error message below
-            }
-            System.out.println("Please enter a whole number greater than 0.");
-        }
+        scanner.close();
     }
 }
