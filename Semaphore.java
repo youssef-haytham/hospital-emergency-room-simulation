@@ -9,7 +9,7 @@ public class Semaphore {
 
     public synchronized void release() {
         permits++;
-        notify();
+        notifyAll();
     }
 
     public synchronized void acquire() throws InterruptedException {
@@ -20,13 +20,15 @@ public class Semaphore {
     }
 
     public synchronized boolean tryAcquire(long millis) throws InterruptedException {
-        long deadline = System.currentTimeMillis() + millis;
-        while (permits <= 0) {
-            long remaining = deadline - System.currentTimeMillis();
-            if (remaining <= 0) return false;
-            wait(remaining);
+    long deadline = System.currentTimeMillis() + millis;
+    while (permits <= 0) {
+        long remaining = deadline - System.currentTimeMillis();
+        if (remaining <= 0) {
+            return false;
         }
-        permits--;
-        return true;
+        wait(remaining);
     }
+    permits--;
+    return true;
+}
 }

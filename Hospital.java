@@ -17,7 +17,7 @@ public class Hospital {
         WaitingRoom waitingRoom = new WaitingRoom(capacity);
         TreatmentRooms treatmentRooms = new TreatmentRooms();
 
-        // from here the code needs more review 
+        // ================ from here the code still needs more review =============
 
         // Doctors first, so they are already idle when patients arrive.
         List<Thread> doctorThreads = new ArrayList<>();
@@ -40,7 +40,7 @@ public class Hospital {
             names.append(patient.getPatientName());
         }
 
-        Status_printer.print_status("Patients arriving:");
+        Status_printer.print_status("\nPatients arriving:");
         Status_printer.print_status(names.toString());
 
         for (Patient patient : patients) {

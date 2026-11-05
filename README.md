@@ -29,7 +29,7 @@ safely, without race conditions or deadlocks.
 | `Semaphore` | Custom counting semaphore (blocking, based on the lab), with a timed acquire method. |
 | `WaitingRoom` | Bounded buffer of patients, synchronized with semaphores. |
 | `TreatmentRooms` | The two treatment rooms, controlled by a semaphore. |
-| `Logger` | Prints simulation events one line at a time so lines do not mix. |
+| `Status_printer` | Prints simulation events one line at a time so lines do not mix. |
 
 ## Requirements
 

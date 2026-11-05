@@ -1,6 +1,5 @@
 import java.util.concurrent.ThreadLocalRandom;
 
-
 public class Doctor implements Runnable {
 
     private static final long ROOM_TIMEOUT_MS = 3000;
@@ -13,11 +12,7 @@ public class Doctor implements Runnable {
     private final WaitingRoom waitingRoom;
     private final TreatmentRooms treatmentRooms;
 
-    public Doctor(
-            int doctorId,
-            WaitingRoom waitingRoom,
-            TreatmentRooms treatmentRooms
-    ) {
+    public Doctor(int doctorId,WaitingRoom waitingRoom,TreatmentRooms treatmentRooms) {
         this.doctorId = doctorId;
         this.waitingRoom = waitingRoom;
         this.treatmentRooms = treatmentRooms;

@@ -15,23 +15,40 @@ public class WaitingRoom {
         this.queue_lock = new Semaphore(1);
     }
 
-    public void enter(Patient p) throws InterruptedException { // redundant safety check ?
+    // public void enter(Patient p) throws InterruptedException { // redundant safety check ?
 
-        if (available_seats.tryAcquire(0) == false) {
-            Status_printer.print_status("The waiting room is full." + System.lineSeparator() + p + " is waiting outside for an available seat.");
+    //     if (available_seats.tryAcquire(1) == false) {
+    //         Status_printer.print_status("The waiting room is full." + System.lineSeparator() + p + " is waiting outside for an available seat.");
             
-            available_seats.acquire(); // decrement available_seats and block current thread and force it to wait
-        }
+    //         available_seats.acquire(); // decrement available_seats and block current thread and force it to wait
+    //     }
 
-        queue_lock.acquire();
+    //     queue_lock.acquire();
 
-        queue.add(p);
-        Status_printer.print_status(p + " entered the waiting room.");
+    //     queue.add(p);
+    //     Status_printer.print_status(p + " entered the waiting room.");
 
-        queue_lock.release();
+    //     queue_lock.release();
 
-        waiting_patients.release();
+    //     waiting_patients.release();
+    // }
+
+    public void enter(Patient p) throws InterruptedException {
+
+    if (!available_seats.tryAcquire(0)) {
+        Status_printer.print_status("The waiting room is full." + System.lineSeparator() + p + " is waiting outside for an available seat.");
+        
+        // 3. Now block and wait until a doctor frees a seat.
     }
+    available_seats.acquire();
+    
+    queue_lock.acquire();
+    queue.add(p);
+    Status_printer.print_status(p + " entered the waiting room.");
+    queue_lock.release();
+
+    waiting_patients.release();
+}
 
     public Patient take() throws InterruptedException {
 
