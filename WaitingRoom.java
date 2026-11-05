@@ -19,14 +19,14 @@ public class WaitingRoom {
 
     public void enter(Patient p) throws InterruptedException {
         if (!empty.tryAcquire(0)) {
-            logger.log("The waiting room is full." + System.lineSeparator()
+            Logger.log("The waiting room is full." + System.lineSeparator()
                     + p + " is waiting outside for an available seat.");
             empty.acquire();
         }
         mutex.acquire();
         queue.add(p);
         assert queue.size() <= capacity;
-        logger.log(p + " entered the waiting room.");
+        Logger.log(p + " entered the waiting room.");
         mutex.release();
         full.release();
     }
@@ -40,4 +40,12 @@ public class WaitingRoom {
         empty.release();
         return p;
     }
+
+    public void closeFor(int doctorCount) throws InterruptedException {
+    for (int i = 0; i < doctorCount; i++) {
+        // Adds null markers so each doctor thread unblocks and exits loop after all patients leave
+        queue.add(null);
+        full.release();
+    }
+}
 }
